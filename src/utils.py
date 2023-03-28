@@ -60,7 +60,9 @@ def evaluate_models(X_train, y_train, X_test, y_test, models:dict, hyperparams:d
 
                 if test_score > best_score:
                     best_score = test_score
-                    best_model = current_best_model
+                    best_model = model
+            
+            print("Test score: ", test_score, "for model", model_name)
                 
 
         return (report, best_model)

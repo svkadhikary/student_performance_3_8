@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Data upload</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+      window.onload = function() {
+        var loading = document.getElementById("loading");
+        var content = document.getElementById("content");
+        loading.style.display = "none";
+        content.style.display = "block";
+      };
+
+      function startTraining() {
+        var loading = document.getElementById("loading");
+        var content = document.getElementById("content");
+        loading.style.display = "block";
+        content.style.display = "none";
+      }
+    </script>
+  </head>
+  <body>
+    <div id="loading">
+      <p>Loading...</p>
+      <img src="{{ url_for('static', filename='images/loading.gif') }}" alt="loading icon">
+      <p><b>Do not close the browser while the model is being trained</b></p>
+    </div>
+    <h1>Upload success</h1>
+    <div id="content">
+      <form action="/train" method="post">
+        <button onclick="startTraining()" type="submit">Train Model</button>
+      </form>
+    </div>
+    <div>{{ data | safe }}</div>
+  </body>
+</html>

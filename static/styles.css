@@ -1,0 +1,29 @@
+#loading {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+  }
+
+  body {
+    text-align: center;
+  }
+  h1 {
+    font-weight: bold;
+    font-size: 2em;
+    margin-top: 50px;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-top: 50px;
+  }
+  
+  

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Model Trained</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+	<h1>Model Trained Successfully!</h1>
+    <p>Best model found is {{ model_name }} with a score of {{ model_score }}</p>
+    <p>Click the button below to predict single values with the trained model</p>
+	<button onclick="location.href='{{ url_for('predict_data') }}'">Go to Predict Page</button>
+</body>
+</html>
