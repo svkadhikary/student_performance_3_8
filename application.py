@@ -38,7 +38,7 @@ def upload_file():
     return'''
     <!doctype html>
     <html>
-        <body>
+        <body text-align: center>
             <form method=post enctype=multipart/form-data>
                 <input type=file name=file>
                 <input type=submit value=Upload>
@@ -59,6 +59,7 @@ def train():
     # Render training page with button to start training
     return render_template('train.html', data=df.to_html(index=False))
 
+
 @app.route("/predictdata", methods=['GET', 'POST'])
 def predict_data():
     if request.method == 'GET':
@@ -72,8 +73,8 @@ def predict_data():
             parental_level_of_education=request.form.get('parental_level_of_education'),
             lunch=request.form.get('lunch'),
             test_preparation_course=request.form.get('test_preparation_course'),
-            reading_score=float(request.form.get('writing_score')),
-            writing_score=float(request.form.get('reading_score'))
+            reading_score=float(request.form.get('reading_score')),
+            writing_score=float(request.form.get('writing_score'))
         )
 
         df_pred = data.get_data_as_dataframe()
