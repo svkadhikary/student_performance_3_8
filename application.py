@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, flash, url_for, session
 import pandas as pd
-import time
 import os
+import yaml
 
 from src.pipeline.predict_pipeline import CustomData, PredictionPipeline
 from src.pipeline.train_pipeline import DataTrainingPipeline
@@ -47,23 +47,44 @@ def upload_file():
     </html>
     '''
 
+
 @app.route('/train', methods=['GET', 'POST'])
 def train():
     filename = session.get('filepath')
     df = pd.read_csv(filename)
     if request.method == 'POST':
-        flash("Training model now")
-        train_pipe = DataTrainingPipeline(filename)
-        name, best_score = train_pipe.train_model()
-        return render_template("success.html", model_name=name, model_score=best_score)
-    # Render training page with button to start training
+        with open('models.yaml', 'r') as f:
+            models = yaml.safe_load(f)
+            session['models'] = list(models.keys())
+        return render_template('model_selection.html', models=models)
+    # Render training page with button to go to model selection page
     return render_template('train.html', data=df.to_html(index=False))
 
+
+@app.route("/model_selection", methods=['POST'])
+def model_selection():
+    filename = session.get('filepath')
+    
+    if request.method == 'POST':
+        flash("Training model now")
+        # fetching models and parameters from the html form
+        selected_models = {}
+        for model in session.get('models'):
+            if request.form.get(model):
+                selected_models[model] = {}
+                for param in request.form.getlist(model + '[]'):
+                    param_name, param_val = param.split("|")
+                    selected_models[model][param_name] = param_val
+
+        train_pipe = DataTrainingPipeline(filename)
+        name, best_score = train_pipe.train_model(selected_models)
+        
+        return render_template("success.html", model_name=name, model_score=best_score)
 
 @app.route("/predictdata", methods=['GET', 'POST'])
 def predict_data():
     if request.method == 'GET':
-        return render_template("home.html")
+        return render_template("predict.html")
     
     elif request.method == 'POST':
         
@@ -83,7 +104,7 @@ def predict_data():
         pred_pipeline = PredictionPipeline()
         prediction = pred_pipeline.predict(df_pred)
 
-        return render_template("home.html", results=prediction[0])
+        return render_template("predict.html", results=prediction[0])
     
 
 if __name__ == "__main__":

@@ -21,14 +21,14 @@
   </head>
   <body>
     <div id="loading">
-      <p>Loading...</p>
+      <p style="text-decoration: blueviolet; text-size-adjust: 10px;">Training...</p>
       <img src="{{ url_for('static', filename='images/loading.gif') }}" alt="loading icon">
       <p><b>Do not close the browser while the model is being trained</b></p>
     </div>
     <h1>Upload success</h1>
     <div id="content">
       <form action="/train" method="post">
-        <button onclick="startTraining()" type="submit">Train Model</button>
+        <button onclick="startTraining()" type="submit">Model Selection</button>
       </form>
     </div>
     <div>{{ data | safe }}</div>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Train Models with Grid Search</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<style>
+		.loading-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: rgba(0, 0, 0, 0.5);
+			z-index: 9999;
+			display: none;
+		}
+		.loading-overlay .spinner-border {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			color: #fff;
+		}
+		body {
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<h1>Select Models and Parameters</h1>
+	<form action="{{ url_for('model_selection') }}" method="POST">
+		{% for model, value in models.items() %}
+			<div class="form-group">
+				<input type="checkbox" name="{{ model }}" value="{{ model }}" id="{{ model }}">
+				<label for="{{ model }}"><b>{{ model }}</b></label><br>
+				{% for name, val in value['params'].items() %}
+
+					<input type="checkbox" name="{{ model }}[]" value="{{ name }}|{{ val }}" id="{{ model }}-{{ name }}">
+					<label for="{{ model }}-{{ name }}">{{ name }}: {{ val }}</label><br>
+						
+					
+				{% endfor %}
+			</div>
+		{% endfor %}
+		<button type="submit">Submit</button>
+	</form>
+</body>
+</html>

@@ -27,12 +27,12 @@ class DataTrainingPipeline:
         except Exception as e:
             raise CustomException(e, sys)
     
-    def train_model(self):
+    def train_model(self, selected_model_w_param):
         try:
             logging.info("Model training started")
             model_trainer_obj = ModelTrainer()
             train_arr, test_arr = self.data_preprocessing()
-            name, best_score = model_trainer_obj.initiate_model_trainer(train_arr, test_arr)
+            name, best_score = model_trainer_obj.initiate_model_trainer(train_arr, test_arr, selected_model_w_param)
             logging.info(f"Best model found {name} with score {best_score}")
             return (name, best_score)
 

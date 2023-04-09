@@ -32,7 +32,8 @@ def evaluate_models(X_train, y_train, X_test, y_test, models:dict, hyperparams:d
         report = {}
         best_model = None
         best_score = float('-inf')
-        for model_name, model in models.items():
+        for model_name, model_class in models.items():
+            model = model_class()
             if model_name in hyperparams:
 
                 param_grid = hyperparams[model_name]

@@ -7,4 +7,5 @@ xgboost
 seaborn
 matplotlib
 dill
+PyYAML
 -e .
