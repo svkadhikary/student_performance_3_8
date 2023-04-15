@@ -7,7 +7,18 @@
 <body>
 	<h1>Model Trained Successfully!</h1>
     <p>Best model found is {{ model_name }} with a score of {{ model_score }}</p>
-    <p>Click the button below to predict single values with the trained model</p>
+    <p>Click the button below to predict single values with the best trained model</p>
 	<button onclick="location.href='{{ url_for('predict_data') }}'">Go to Predict Page</button>
+	<h1>Other models and their scores</h1>
+    <form action="/save_models" method="POST">
+      {% for model, score in models.items() %}
+        <label>
+          <input type="checkbox" name="models_to_save" value="{{ model }}">
+          {{ model }} - {{ score }}
+        </label>
+        <br>
+      {% endfor %}
+      <input type="submit" value="Save Selected Models">
+    </form>
 </body>
 </html>

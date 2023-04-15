@@ -8,46 +8,122 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script>
+		function startAnimation(){
+			// Get the text and image elements from the HTML page
+			const statusText = document.getElementById("status-text");
+			const statusImage = document.getElementById("status-image");
+
+			// Set the initial status
+			let status = "Training is in progress...";
+			let imageSrc = "/static/images/loading.gif";
+
+			// Update the text and image elements every second
+			setInterval(() => {
+			// Update the status text
+			status += ".";
+			if (status.length > 30) {
+				status = "Training is in progress...";
+			}
+			statusText.innerHTML = status;
+
+			document.getElementById("overlay").style.display = "block";
+			document.getElementById("content").style.display = "none";
+
+			// Update the status image
+			const now = new Date();
+			if (now.getSeconds() % 9 === 0) {
+				imageSrc = "/static/images/loading2.gif";
+			} else {
+				imageSrc = "/static/images/loading.gif";
+			}
+			statusImage.src = imageSrc;
+			}, 1000)
+		};
+		window.onload = function() {
+			var training = document.getElementById("overlay");
+			var content = document.getElementById("content");
+			training.style.display = "none";
+			content.style.display = "block";
+      	};
+	</script>
 	<style>
-		.loading-overlay {
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background-color: rgba(0, 0, 0, 0.5);
-			z-index: 9999;
-			display: none;
+		body {
+			text-align: center;
 		}
-		.loading-overlay .spinner-border {
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		img {
+			width: 300px;
+			height: 300px;
+		}
+		#overlay {
+			align-items: center;
 			position: absolute;
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			color: #fff;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.7);
+			z-index: 9999;
+			display: none;
 		}
-		body {
-			text-align: center;
+		#overlay.show {
+			display: block;
+		}
+		.flashes {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			}
+
+			.flashes li {
+			margin: 10px 0;
+			padding: 15px;
+			border-radius: 5px;
+			background-color: #ffc107;
+			color: #fff;
+			font-weight: bold;
 		}
 	</style>
 </head>
 <body>
-	<h1>Select Models and Parameters</h1>
-	<form action="{{ url_for('model_selection') }}" method="POST">
-		{% for model, value in models.items() %}
-			<div class="form-group">
-				<input type="checkbox" name="{{ model }}" value="{{ model }}" id="{{ model }}">
-				<label for="{{ model }}"><b>{{ model }}</b></label><br>
-				{% for name, val in value['params'].items() %}
+	{% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+	<div class="container" id="content">
+		<h1>Select Models and Parameters</h1>
+		<form action="{{ url_for('model_selection') }}" method="POST">
+			{% for model, value in models.items() %}
+				<div class="form-group">
+					<input type="checkbox" name="{{ model }}" value="{{ model }}" id="{{ model }}">
+					<label for="{{ model }}"><b>{{ model }}</b></label><br>
+					{% for name, val in value['params'].items() %}
 
-					<input type="checkbox" name="{{ model }}[]" value="{{ name }}|{{ val }}" id="{{ model }}-{{ name }}">
-					<label for="{{ model }}-{{ name }}">{{ name }}: {{ val }}</label><br>
+						<input type="checkbox" name="{{ model }}[]" value="{{ name }}|{{ val }}" id="{{ model }}-{{ name }}">
+						<label for="{{ model }}-{{ name }}">{{ name }}: {{ val }}</label><br>
+							
 						
-					
-				{% endfor %}
-			</div>
-		{% endfor %}
-		<button type="submit">Submit</button>
-	</form>
+					{% endfor %}
+				</div>
+			{% endfor %}
+			<button id="start-button" onclick="startAnimation()" type="submit">Submit</button>
+		</form>
+	</div>
+	<div id="overlay">
+		<p><b>Do not close the browser while the model is being trained</b></p>
+		<img id="status-image" src="{{ url_for('static', filename='images/loading.gif') }}" alt="loading icon">
+		<p id="status-text" style="text-decoration: blueviolet; text-size-adjust: 20px;">Training is in progress...</p>
+	</div>
 </body>
 </html>

@@ -4,15 +4,6 @@ from dataclasses import dataclass
 import importlib
 import yaml
 
-from catboost import CatBoostRegressor
-from sklearn.ensemble import AdaBoostRegressor, GradientBoostingRegressor, RandomForestRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.tree import DecisionTreeRegressor
-from xgboost import XGBRegressor
-
-from sklearn.metrics import r2_score
-
 from src.exception import CustomException
 from src.logger import logging
 from src.utils import save_object, evaluate_models
@@ -20,7 +11,8 @@ from src.utils import save_object, evaluate_models
 
 @dataclass
 class ModelTrainerConfig:
-    trained_model_file_path = os.path.join("artifacts", "model.pkl")
+    filename = f"best_model.pkl"
+    trained_model_file_path = os.path.join("artifacts/models", filename)
 
 
 class ModelTrainer:
@@ -160,15 +152,19 @@ class ModelTrainer:
                 hyperparams=model_params
                 )
             
-            model_report = {k: v for k, v in sorted(model_report.items(), key=lambda item: item[1], reverse=True)}
+            model_report = dict(sorted(model_report.items(), key=lambda x: x[1]['score'], reverse=True))
 
-            best_model_name, best_model_score = next(iter(model_report.items()))
+            best_model_tuple = next(iter(model_report.items()))
+
+            best_model_name = best_model_tuple[0]
+            best_model_score = best_model_tuple[1]['score']
 
             if best_model_score < 0.6:
                 raise CustomException("No best model found")
             
             logging.info("Best model found")
             print("Best model:", best_model)
+
 
             save_object(
                 obj = best_model,
@@ -178,7 +174,7 @@ class ModelTrainer:
 
             del models_classes
 
-            return (best_model_name, best_model_score)
+            return (best_model_name, best_model_score, model_report)
 
         except Exception as e:
             raise CustomException(e, sys)

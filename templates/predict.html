@@ -1,7 +1,21 @@
 <html>
     <head>
         <title>Prediction</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            body {
+			text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+		}
+            label {
+                font-weight: bold;
+                font-size: large;
+            }
+        </style>
     </head>
 <body>
     <div class="login">
@@ -102,14 +116,22 @@
         <div class="mb-3">
             <label class="form-label">Reading Score out of 100</label>
             <input class="form-control" type="number" name="writing_score"
-                placeholder="Enter your Reading Score" min='0' max='100' />
+                placeholder="Enter your Reading Score" min='0' max='100'/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Choose the model you want to predict with:</label>
+            {% for model, score in models.items() %}
+                <input type="radio" id="{{ model }}" name="model" value="{{ model }}" required>
+                <label for="{{ model }}">{{ model }}:{{ score }}</label><br>
+            {% endfor %}
+            <br>
         </div>
         <div class="mb-3">
             <input class="btn btn-primary" type="submit" value="Predict your Maths Score" required />
         </div>
     </form>
     <h2>
-       THE  prediction is {{results}}
+       Maths score is {{results}}
     </h2>
    <body>
 </html>

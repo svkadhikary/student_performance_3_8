@@ -34,6 +34,7 @@ def evaluate_models(X_train, y_train, X_test, y_test, models:dict, hyperparams:d
         best_score = float('-inf')
         for model_name, model_class in models.items():
             model = model_class()
+            report[model_name] = {}
             if model_name in hyperparams:
 
                 param_grid = hyperparams[model_name]
@@ -48,7 +49,8 @@ def evaluate_models(X_train, y_train, X_test, y_test, models:dict, hyperparams:d
                 train_score = r2_score(y_train, y_train_pred)
                 test_score = r2_score(y_test, y_test_pred)
 
-                report[model_name] = test_score
+                report[model_name]["score"] = round(test_score, 2)
+                report[model_name]["model"] = current_best_model
 
                 if test_score > best_score:
                     best_score = test_score
@@ -57,11 +59,15 @@ def evaluate_models(X_train, y_train, X_test, y_test, models:dict, hyperparams:d
             else:
                 model.fit(X_train, y_train)
                 test_score = r2_score(y_test, model.predict(X_test))
-                report[model_name] = test_score
+
+                report[model_name]["score"] = test_score
+                report[model_name]["model"] = model
 
                 if test_score > best_score:
                     best_score = test_score
                     best_model = model
+                
+                
             
             print("Test score: ", test_score, "for model", model_name)
                 

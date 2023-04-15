@@ -1,22 +1,30 @@
-from flask import Flask, request, render_template, redirect, flash, url_for, session
+from flask import Flask, request, render_template, redirect, flash, url_for, session, Response
 import pandas as pd
 import os
 import yaml
+import json
 
+from src.components.model_manager import ModelManager
 from src.pipeline.predict_pipeline import CustomData, PredictionPipeline
 from src.pipeline.train_pipeline import DataTrainingPipeline
 
-
+# initialize flask app
 application = Flask(__name__)
 app = application
-
+# setup upload folder for dataset uploads
 app.config['UPLOAD_FOLDER'] = './uploads'
+# configure secret key
 app.secret_key = "super_secret_key"
 
+# configure global variable
+model_report = {}
+
+# index page; todo: other modifications
 @app.route("/")
 def index():
     return redirect(url_for('upload_file'))
 
+# dataset upload route
 @app.route("/upload", methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -47,7 +55,7 @@ def upload_file():
     </html>
     '''
 
-
+# dataset review and model selection
 @app.route('/train', methods=['GET', 'POST'])
 def train():
     filename = session.get('filepath')
@@ -60,7 +68,7 @@ def train():
     # Render training page with button to go to model selection page
     return render_template('train.html', data=df.to_html(index=False))
 
-
+# Model and hyperparameter selection page
 @app.route("/model_selection", methods=['POST'])
 def model_selection():
     filename = session.get('filepath')
@@ -77,17 +85,45 @@ def model_selection():
                     selected_models[model][param_name] = param_val
 
         train_pipe = DataTrainingPipeline(filename)
-        name, best_score = train_pipe.train_model(selected_models)
+        global model_report
+        best_model, best_score, model_report = train_pipe.train_model(selected_models)
         
-        return render_template("success.html", model_name=name, model_score=best_score)
+        models = {model_name: model_report[model_name]['score'] for model_name in model_report}
+        
+        return render_template("success.html", model_name=best_model, model_score=best_score, models=models)
 
+# Save user-selected models
+@app.route('/save_models', methods=['POST'])
+def save_models():
+    if request.method == 'POST':
+        # get selected models from form
+        models = request.form.getlist('models_to_save')
+        models = [val.split("-")[0] for val in models]
+        global model_report
+        # save selected models
+        model_manager = ModelManager()
+        res = model_manager.save_model(models, model_report)
+
+        if res:
+            flash("Models saved")
+            return redirect(url_for('predict_data'))
+
+        return Response("Error")
+
+# Single row data prediction
 @app.route("/predictdata", methods=['GET', 'POST'])
 def predict_data():
+    
+    pred_pipeline = PredictionPipeline()
+    saved_models = pred_pipeline.get_saved_models()
+
     if request.method == 'GET':
-        return render_template("predict.html")
+        return render_template("predict.html", models=saved_models)
     
     elif request.method == 'POST':
         
+        model = request.form['model']
+        print(model)
         data = CustomData(
             gender=request.form.get('gender'),
             race_ethnicity=request.form.get('ethnicity'),
@@ -101,11 +137,10 @@ def predict_data():
         df_pred = data.get_data_as_dataframe()
         print(df_pred)
 
-        pred_pipeline = PredictionPipeline()
-        prediction = pred_pipeline.predict(df_pred)
+        prediction = pred_pipeline.predict(df_pred, model)
 
-        return render_template("predict.html", results=prediction[0])
-    
+        return render_template("predict.html", results=prediction[0], models=saved_models)
+
 
 if __name__ == "__main__":
     app.run("0.0.0.0", debug=True)

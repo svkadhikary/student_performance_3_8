@@ -1,3 +1,4 @@
+import os
 import sys
 import pandas as pd
 from src.exception import CustomException
@@ -6,15 +7,30 @@ from src.utils import load_object
 
 class PredictionPipeline:
     def __init__(self) -> None:
-        pass
+        self.models_path = "artifacts/models/"
+        self.preprocessor_path = 'artifacts/preprocessor.pkl'
 
-    def predict(self, features):
+    def get_saved_models(self):
         try:
-            model_path = 'artifacts/model.pkl'
-            preprocessor_path = 'artifacts/preprocessor.pkl'
-            
-            model = load_object(file_path=model_path)
-            preprocessor = load_object(file_path=preprocessor_path)
+            saved_models = {}
+            for model in os.listdir(self.models_path):
+                if model.endswith(".pkl"):
+                    model_name = model.split("_")[0]
+                    model_score = model.split(".pkl")[0].split("_")[-1]
+                    saved_models[model_name] = model_score
+            return saved_models
+        except Exception as e:
+            raise CustomException(e, sys)
+
+    def predict(self, features, model):
+        try:
+            select_model = ""
+            for model_name in os.listdir(self.models_path):
+                if model in model_name:
+                    select_model = os.path.join(self.models_path, model_name)
+
+            model = load_object(file_path=select_model)
+            preprocessor = load_object(file_path=self.preprocessor_path)
 
             data_transformed = preprocessor.transform(features)
 
