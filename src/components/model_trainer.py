@@ -46,7 +46,8 @@ class ModelTrainer:
             return model_classes
         except Exception as e:
             raise CustomException(e, sys)
-        
+    
+    # load model configurations from yaml file respective to user selection
     def model_param_conf(self, selected_models_w_params):
         try:
             with open("models.yaml", 'rb') as yaml_file:
@@ -65,7 +66,7 @@ class ModelTrainer:
         except Exception as e:
             raise CustomException(e, sys)
 
-    
+    # start training gridsearch on the selected models
     def initiate_model_trainer(self, train_arr, test_arr, selected_models_w_param):
         try:
             logging.info("Split training and test data")
@@ -81,67 +82,6 @@ class ModelTrainer:
             logging.info("configuring model parameters")
             model_params = self.model_param_conf(selected_models_w_param)
 
-            # models = {
-            #     "Random Forest": RandomForestRegressor(),
-            #     "Decision Tree": DecisionTreeRegressor(),
-            #     "Gradient Boosting": GradientBoostingRegressor(),
-            #     "Linear Regression": LinearRegression(),
-            #     "K-Neighbors Regressor": KNeighborsRegressor(),
-            #     "XGBRegressor": XGBRegressor(),
-            #     "CatBoosting Regressor": CatBoostRegressor(verbose=False),
-            #     "AdaBoost Regressor": AdaBoostRegressor()
-            # }
-
-            # hyperparams = {
-            #     "Random Forest": {
-            #         "n_estimators": [100, 500, 1000],
-            #         "max_features": ["sqrt", "log2"],
-            #         "max_depth": [5, 10, 15],
-            #         "min_samples_split": [2, 5, 10],
-            #         "min_samples_leaf": [1, 2, 4]
-            #     },
-            #     "Decision Tree": {
-            #         'max_depth': [3, 5, 7, 15],
-            #         'min_samples_split': [2, 5, 10],
-            #         'min_samples_leaf': [1, 2, 4],
-            #         'max_features': ['auto', 'sqrt', 'log2']
-            #     },
-            #     "Gradient Boosting": {
-            #         'n_estimators': [100, 500, 1000],
-            #         'max_depth': [3, 5, 7],
-            #         'learning_rate': [0.01, 0.1, 0.5],
-            #         'subsample': [0.5, 0.8, 1.0],
-            #         'loss': ['ls', 'lad', 'huber', 'quantile']
-            #     },
-            #     "Linear Regression": {
-            #         'fit_intercept': [True, False]
-            #     },
-            #     "K-Neighbors Regressor": {
-            #         'n_neighbors': [5, 10, 15],
-            #         'weights': ['uniform', 'distance'],
-            #         'p': [1, 2],
-            #     },
-            #     "XGBRegressor": {
-            #         'learning_rate': [0.01, 0.1, 0.2],
-            #         'max_depth': [3, 5, 7],
-            #         'n_estimators': [50, 100, 200],
-            #         'reg_alpha': [0.1, 1, 10],
-            #         'reg_lambda': [0.1, 1, 10]
-            #     },
-            #     "CatBoosting Regressor": {
-            #         'iterations': [100, 500, 1000],
-            #         'learning_rate': [0.01, 0.05, 0.1],
-            #         'depth': [4, 6, 8],
-            #         'l2_leaf_reg': [1, 3, 5],
-            #         'loss_function': ['MAE', 'RMSE']
-            #     },
-            #     "AdaBoost Regressor": {
-            #         'n_estimators': [50, 100, 200],
-            #         'learning_rate': [0.01, 0.1, 1],
-            #         'loss': ['linear', 'square', 'exponential']
-            #     }
-            # }
-            
             # evaluate which model gives best score
 
             logging.info("Evaluating models")

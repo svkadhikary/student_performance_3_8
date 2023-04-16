@@ -56,10 +56,7 @@
 			flex-direction: column;
 			align-items: center;
 		}
-		img {
-			width: 300px;
-			height: 300px;
-		}
+		
 		#overlay {
 			align-items: center;
 			position: absolute;
@@ -75,32 +72,9 @@
 		#overlay.show {
 			display: block;
 		}
-		.flashes {
-			list-style: none;
-			margin: 0;
-			padding: 0;
-			}
-
-			.flashes li {
-			margin: 10px 0;
-			padding: 15px;
-			border-radius: 5px;
-			background-color: #ffc107;
-			color: #fff;
-			font-weight: bold;
-		}
 	</style>
 </head>
 <body>
-	{% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
 	<div class="container" id="content">
 		<h1>Select Models and Parameters</h1>
 		<form action="{{ url_for('model_selection') }}" method="POST">

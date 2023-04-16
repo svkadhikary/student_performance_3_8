@@ -22,12 +22,19 @@ class ModelManager:
 
     def check_model_existance(self, model_name, model_score):
         try:
-            for model in os.listdir(self.model_path):
-                if model_name in model:
+            models = [f for f in os.listdir(self.model_path) if f.endswith('.pkl')]
+            print(models)
+
+            for model in models:
+                if model_name == model.split("_")[0]:
+                    print(model, " found")
                     saved_model_score = model.split(".pkl")[0].split("_")[-1]
                     if float(saved_model_score) >= float(model_score):
+                        print(saved_model_score, " is higher")
                         return True
-                    os.remove(self.model_path + model)
+                    else:
+                        print("saved model score is lower, deleting model")
+                        os.remove(os.path.join(self.model_path, model))
                     return False
         except Exception as e:
             raise CustomException(e, sys)
@@ -35,6 +42,7 @@ class ModelManager:
     def save_model(self, models_to_save, model_report):
         try:
             for model_name in models_to_save:
+                print("checking ", model_name)
                 score = model_report[model_name]['score']
                 ## check if the saved model has better score
                 if self.check_model_existance(model_name, score):
@@ -57,3 +65,5 @@ class ModelManager:
             return load_object(file_path=filepath)
         except Exception as e:
             raise CustomException(e, sys)
+
+

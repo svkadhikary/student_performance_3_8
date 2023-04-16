@@ -2,7 +2,6 @@ from flask import Flask, request, render_template, redirect, flash, url_for, ses
 import pandas as pd
 import os
 import yaml
-import json
 
 from src.components.model_manager import ModelManager
 from src.pipeline.predict_pipeline import CustomData, PredictionPipeline
@@ -42,11 +41,11 @@ def upload_file():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
             session['filepath'] = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             return redirect(url_for('train'))
-        
+    
     return'''
     <!doctype html>
     <html>
-        <body text-align: center>
+        <body style: text-align: center>
             <form method=post enctype=multipart/form-data>
                 <input type=file name=file>
                 <input type=submit value=Upload>
@@ -74,7 +73,6 @@ def model_selection():
     filename = session.get('filepath')
     
     if request.method == 'POST':
-        flash("Training model now")
         # fetching models and parameters from the html form
         selected_models = {}
         for model in session.get('models'):
