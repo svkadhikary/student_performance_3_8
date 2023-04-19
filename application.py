@@ -46,7 +46,7 @@ def upload_file():
     <!doctype html>
     <html>
         <body style="text-align: center;">
-            <h3>Uppload the dataest to train with</h3>
+            <h3>Upload the dataest to train with</h3>
             <form method=post enctype=multipart/form-data>
                 <input type=file name=file>
                 <input type=submit value=Upload>
