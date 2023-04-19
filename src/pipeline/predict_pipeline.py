@@ -10,6 +10,7 @@ class PredictionPipeline:
         self.models_path = "artifacts/models/"
         self.preprocessor_path = 'artifacts/preprocessor.pkl'
 
+    # get saved models name and scores to dsplay on the prediction form
     def get_saved_models(self):
         try:
             saved_models = {}
@@ -39,6 +40,36 @@ class PredictionPipeline:
             return preds
         except Exception as e:
             raise CustomException(e, sys)
+    
+    def predict_on_batch(self, filepath, model):
+
+        try:
+            df = pd.read_csv(filepath)
+            # Check if the required columns exist
+            required_cols = ['gender','race_ethnicity','parental_level_of_education','lunch','test_preparation_course','reading_score','writing_score']
+            if not all(col in df.columns for col in required_cols):
+                return "CSV file is missing required columns."
+            df = df.reindex(columns=required_cols)
+
+            select_model = ""
+            for model_name in os.listdir(self.models_path):
+                if model in model_name:
+                    select_model = os.path.join(self.models_path, model_name)
+
+            model = load_object(file_path=select_model)
+            preprocessor = load_object(file_path=self.preprocessor_path)
+
+            data_transformed = preprocessor.transform(df)
+
+            df['Maths score'] = model.predict(data_transformed)
+
+            return df
+        
+        except Exception as e:
+            raise CustomException(e, sys)
+        
+
+        return df
 
 
 

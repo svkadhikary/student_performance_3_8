@@ -45,7 +45,8 @@ def upload_file():
     return'''
     <!doctype html>
     <html>
-        <body style: text-align: center>
+        <body style="text-align: center;">
+            <h3>Uppload the dataest to train with</h3>
             <form method=post enctype=multipart/form-data>
                 <input type=file name=file>
                 <input type=submit value=Upload>
@@ -122,23 +123,41 @@ def predict_data():
         
         model = request.form['model']
         print(model)
-        data = CustomData(
-            gender=request.form.get('gender'),
-            race_ethnicity=request.form.get('ethnicity'),
-            parental_level_of_education=request.form.get('parental_level_of_education'),
-            lunch=request.form.get('lunch'),
-            test_preparation_course=request.form.get('test_preparation_course'),
-            reading_score=float(request.form.get('reading_score')),
-            writing_score=float(request.form.get('writing_score'))
-        )
 
-        df_pred = data.get_data_as_dataframe()
-        print(df_pred)
+        # Get the selected prediction mode from the radio button
+        prediction_mode = request.form.get('prediction_mode')
 
-        prediction = pred_pipeline.predict(df_pred, model)
+        if prediction_mode == 'single_row':
+            data = CustomData(
+                gender=request.form.get('gender'),
+                race_ethnicity=request.form.get('ethnicity'),
+                parental_level_of_education=request.form.get('parental_level_of_education'),
+                lunch=request.form.get('lunch'),
+                test_preparation_course=request.form.get('test_preparation_course'),
+                reading_score=float(request.form.get('reading_score')),
+                writing_score=float(request.form.get('writing_score'))
+            )
 
-        return render_template("predict.html", results=prediction[0], models=saved_models)
+            df_pred = data.get_data_as_dataframe()
+            print(df_pred)
 
+            prediction = pred_pipeline.predict(df_pred, model)
+
+            return render_template("predict.html", results=prediction[0], models=saved_models)
+        
+        elif prediction_mode == 'entire_dataset':
+            file = request.files['dataset']
+            if file:
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+                file.save(filepath)
+
+                prediction = pred_pipeline.predict_on_batch(filepath, model)
+
+            return render_template("predict_on_batch.html", df=prediction.to_html(index=False))
+
+
+## todo: evaulation
 
 if __name__ == "__main__":
     app.run("0.0.0.0", debug=True)
