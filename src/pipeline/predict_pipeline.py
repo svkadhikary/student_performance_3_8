@@ -45,22 +45,26 @@ class PredictionPipeline:
 
         try:
             df = pd.read_csv(filepath)
-            # Check if the required columns exist
+            # required column names for prediction
             required_cols = ['gender','race_ethnicity','parental_level_of_education','lunch','test_preparation_course','reading_score','writing_score']
+            # Check if the required columns exist
             if not all(col in df.columns for col in required_cols):
                 return "CSV file is missing required columns."
+            # eliminate unnecessary columns
             df = df.reindex(columns=required_cols)
 
+            # model selection
             select_model = ""
             for model_name in os.listdir(self.models_path):
                 if model in model_name:
                     select_model = os.path.join(self.models_path, model_name)
 
+            # load model and preprocessor
             model = load_object(file_path=select_model)
             preprocessor = load_object(file_path=self.preprocessor_path)
 
+            # transform data and predict
             data_transformed = preprocessor.transform(df)
-
             df['Maths score'] = model.predict(data_transformed)
 
             return df
@@ -68,8 +72,6 @@ class PredictionPipeline:
         except Exception as e:
             raise CustomException(e, sys)
         
-
-        return df
 
 
 
