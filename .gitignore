@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 # Distribution / 
+catboost_info/*
 .ebextensions/
 .Python
 build/
