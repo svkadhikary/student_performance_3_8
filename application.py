@@ -19,9 +19,28 @@ app.secret_key = "super_secret_key"
 model_report = {}
 
 # index page; todo: other modifications
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
-    return redirect(url_for('upload_file'))
+    if request.method == 'POST':
+        inp = request.form.get('inp')
+        if inp == "upload":
+            return redirect(url_for('upload_file'))
+        return redirect(url_for('predict_data'))
+    return '''
+    <!doctype html>
+    <html>
+    <body style="text-align: center;">
+    <h4>Upload dataset and train different models or predict values based on saved trained models</h4>
+        <div class="container">
+            <form method=post>
+                <input type='submit' value=Predict name=inp>
+                <div class="row"></div><br>
+                <input type='submit' value=upload name=inp>
+            </form>
+        </div>
+    </body>
+    </html>
+    '''
 
 # dataset upload route
 @app.route("/upload", methods=['GET', 'POST'])
@@ -51,6 +70,7 @@ def upload_file():
                 <input type=file name=file>
                 <input type=submit value=Upload>
             </form>
+            <br>
         </body>
     </html>
     '''
