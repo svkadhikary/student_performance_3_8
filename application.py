@@ -30,7 +30,7 @@ def index():
     <!doctype html>
     <html>
     <body style="text-align: center;">
-    <h4>Upload dataset and train different models or predict values based on saved trained models</h4>
+    <h2>Upload dataset and train different models or predict values based on saved trained models</h2>
         <div class="container">
             <form method=post>
                 <input type='submit' value=Predict name=inp>
